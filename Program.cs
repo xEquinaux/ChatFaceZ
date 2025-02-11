@@ -4,7 +4,6 @@ using System.IO;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -12,6 +11,7 @@ using FoundationR;
 using Microsoft.Win32;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using Color = System.Drawing.Color;
 
 namespace Foundation_GameTemplate
 {
@@ -85,9 +85,10 @@ namespace Foundation_GameTemplate
 			foreach (var message in array)
 			{
 				List<string> wrappedText = WrapText(message, 20);
+				e.rewBatch.Draw(REW.Create(50, 20, Color.Red, Ext.GetFormat(4)), 0, (int)yOffset + 12);
 				foreach (var line in wrappedText)
 				{
-					e.rewBatch.DrawString(font, line, 0, (int)yOffset, 300, 1000);
+					e.rewBatch.DrawString(font, line, 50, (int)yOffset, 300, 1000);
 					yOffset += 20;
 				}
 			}
@@ -100,7 +101,7 @@ namespace Foundation_GameTemplate
 		protected void Update(UpdateArgs e)
 		{
 			Task.WaitAll(Task.Delay(1000));
-			message.Add(++num + " Therewasanodditytodaywhileworkingwithsomeintegersinthecode. " + num);
+			message.Add(++num + " There was an oddity today while working with some integers in the code. " + num);
 			//There was an oddity today while working with some integers in the code.
 			//Therewasanodditytodaywhileworkingwithsomeintegersinthecode.
 			
@@ -148,45 +149,10 @@ namespace Foundation_GameTemplate
 				}
 				if (num2 > maxWidth)
 				{
-					List<string> list = new List<string>();
-					string complete = "";
-					string trim = "";
-					int num5 = 0;
-					if (w.Length > maxWidth)
+					List<string> list2 = new List<string>();
+					for (int i = 0; i < add.Length; i += (int)maxWidth)
 					{
-						int num6 = 0;
-						int num7 = 0;
-						int num8 = 0;
-						for (int i = (int)maxWidth * ++num6; i < w.Length; i += (int)maxWidth)
-						{
-							reduce:
-							try
-							{ 
-								num8 = w.Substring(i, (int)maxWidth * num6 + num7).Length;
-							}
-							catch 
-							{ 
-								num7--; 
-								goto reduce;
-							}
-							list.Add(w.Substring(i, num8));
-						}
-					}
-					else
-					{ 
-						for (int i = 0; i < add.Length; i += (int)maxWidth)
-						{
-							list.Add(add.Substring(Math.Min(add.Length, i), Math.Min(add.Length - i, (int)maxWidth)));
-						}
-					}
-					for (int i = 0; i < list?.Count; i++)
-					{
-						num5 += list[i].Length;
-						complete += list[i];
-						if (num5 > maxWidth)
-						{
-							line.Add(complete);
-						}
+						line.Add(add.Substring(Math.Min(add.Length, i), Math.Min(add.Length - i, (int)maxWidth)));
 					}
 					num2 = 0;
 					add = "";
