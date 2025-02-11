@@ -4,6 +4,7 @@ using System.IO;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -99,7 +100,10 @@ namespace Foundation_GameTemplate
 		protected void Update(UpdateArgs e)
 		{
 			Task.WaitAll(Task.Delay(1000));
-			message.Add(++num + " Therewasanodditytodaywhileworkingwithsomeintegersinthecode. Therewasanodditytodaywhileworkingwithsomeintegersinthecode. " + num);
+			message.Add(++num + " Therewasanodditytodaywhileworkingwithsomeintegersinthecode. " + num);
+			//There was an oddity today while working with some integers in the code.
+			//Therewasanodditytodaywhileworkingwithsomeintegersinthecode.
+			
 			if (--retry <= 0)
 			{
 				message.Clear();
@@ -118,16 +122,6 @@ namespace Foundation_GameTemplate
 			int num = 0;
 			int num2 = 0;
 			int num3 = 0;
-			/*
-			for (int i = 0; i < ((string)text.Clone()).Length; i++)
-			{
-				if (i >= 20 + num)
-				{
-					text = text.Insert(Math.Min(num, text.Length), " ");
-					num += 20;
-					continue;
-				}
-			}*/
 
 			string add = "";
 			string[] word = text.Split(" ");
@@ -154,11 +148,44 @@ namespace Foundation_GameTemplate
 				}
 				if (num2 > maxWidth)
 				{
-					if (add.Length > maxWidth)
+					List<string> list = new List<string>();
+					string complete = "";
+					string trim = "";
+					int num5 = 0;
+					if (w.Length > maxWidth)
+					{
+						int num6 = 0;
+						int num7 = 0;
+						int num8 = 0;
+						for (int i = (int)maxWidth * ++num6; i < w.Length; i += (int)maxWidth)
+						{
+							reduce:
+							try
+							{ 
+								num8 = w.Substring(i, (int)maxWidth * num6 + num7).Length;
+							}
+							catch 
+							{ 
+								num7--; 
+								goto reduce;
+							}
+							list.Add(w.Substring(i, num8));
+						}
+					}
+					else
 					{ 
 						for (int i = 0; i < add.Length; i += (int)maxWidth)
-						{ 
-							line.Add(add.Substring(Math.Min(add.Length, i), Math.Min(add.Length - i, (int)maxWidth)));
+						{
+							list.Add(add.Substring(Math.Min(add.Length, i), Math.Min(add.Length - i, (int)maxWidth)));
+						}
+					}
+					for (int i = 0; i < list?.Count; i++)
+					{
+						num5 += list[i].Length;
+						complete += list[i];
+						if (num5 > maxWidth)
+						{
+							line.Add(complete);
 						}
 					}
 					num2 = 0;
