@@ -6,11 +6,13 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-	  <UseWPF>true</UseWPF>
+	<UseWPF>true</UseWPF>
+	<LangVersion>11</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="DirectTerminal.cs" />
+    <Compile Remove="Scroll.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +21,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FoundationR\FoundationR.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FNA">
+      <HintPath>FNA.dll</HintPath>
+    </Reference>
+    <Reference Include="tUserInterface">
+      <HintPath>tUserInterface.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
