@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Media;
 using Brushes = System.Windows.Media.Brushes;
+using TestConsole;
 
 namespace Foundation_GameTemplate
 {
@@ -30,7 +31,10 @@ namespace Foundation_GameTemplate
 	}
 	public class Main : Foundation
 	{
-		List<string> message = new List<string>();
+		internal static Main? Instance;
+		public IList<string> message = new List<string>();
+		public IList<User> user = new List<User>();
+		public int whoAmI;
 		int num = 0;
 		int retry = 10;
 		double maxWidth = 100;
@@ -38,6 +42,8 @@ namespace Foundation_GameTemplate
 
 		internal Main()
 		{
+			Instance = this;
+			new TestConsole.Bot();
 		}
 
 		public override void RegisterHooks()
@@ -79,14 +85,14 @@ namespace Foundation_GameTemplate
 			float yOffset = 0;
 			string[] array = new string[this.message.Count];
 			this.message.CopyTo(array, 0);
-			foreach (var message in array)
+			for (int i = 0; i < array.Length; i++)
 			{
-				List<string> wrappedText = WrapText(message, maxWidth, "Arial", 16f);
-				e.rewBatch.Draw(REW.Create(50, 20, Color.Red, Ext.GetFormat(4)), 0, (int)yOffset + 12);
+				List<string> wrappedText = WrapText(array[i], 200d, "Arial", 16f);
+				e.rewBatch.Draw(user[i].avatar, 0, (int)yOffset + 12);
 				foreach (var line in wrappedText)
 				{
 					e.rewBatch.DrawString(font, line, 50, (int)yOffset, 400, 1000);
-					yOffset += 20;
+					yOffset += 40;
 				}
 			}
 		}
@@ -97,13 +103,15 @@ namespace Foundation_GameTemplate
 
 		protected void Update(UpdateArgs e)
 		{
-			maxWidth = 300;
+			return;
+			maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
-			message.Add(++num + " Therewasanodditytodaywhileworkingwithsomeintegersinthecode. " + num);
+			message.Add(++num + " There was an oddity today while working with some integers in the code. " + num);
 
 			//	There was an oddity today while working with some integers in the code.
 			//	Therewasanodditytodaywhileworkingwithsomeintegersinthecode.
 
+			
 			if (--retry <= 0)
 			{
 				message.Clear();
@@ -114,6 +122,11 @@ namespace Foundation_GameTemplate
 		protected new bool Resize()
 		{
 			return false;
+		}
+
+		public void AddMessage(REW avatar, string username, string message)
+		{
+
 		}
 
 		private List<string> WrapText(string text, double maxWidth, float emSize)
@@ -160,7 +173,7 @@ namespace Foundation_GameTemplate
 					add = "";
 				}
 			}
-			line.Add(text.Substring(Math.Min(text.Length, num3 - 1)));
+			line.Add(text.Substring(Math.Min(text.Length, num3)));
 
 			return line;
 		}
@@ -241,5 +254,11 @@ namespace Foundation_GameTemplate
 
 			return wrappedLines;
 		}
+	}
+	public class User
+	{
+		public string username;
+		public string message;
+		public REW avatar;
 	}
 }
