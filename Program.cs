@@ -12,6 +12,7 @@ using TestConsole;
 using System.Windows.Shapes;
 using ChatFaceZ;
 using ColorConverter = System.Drawing.ColorConverter;
+using craigomatic.sample;
 
 namespace Foundation_GameTemplate
 {
@@ -97,8 +98,13 @@ namespace Foundation_GameTemplate
 					if (!once)
 					{
 						once = true;
+						var _color = (Color)new ColorConverter().ConvertFromString(user[i].uColor);
+						if (_color == Color.White)
+						{
+							_color = Color.Purple;
+						}
 						e.rewBatch.Draw(REW.Create((int)(maxWidth * 1.2f), 20, Color.FromArgb(30, 30, 30), Ext.GetFormat(4)), 62, (int)yOffset + 8 - ScrollLogic.yCoord(message.Count));
-						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height, (Color)new ColorConverter().ConvertFromString(user[i].uColor), 12f);
+						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height, _color, 12f);
 						craigomatic.sample.AvatarGenerator.Generate(e.rewBatch, user[i].username, user[i].channel, 10, (int)yOffset + 8 - ScrollLogic.yCoord(message.Count), user[i].color, 40, 12);
 						yOffset += 20f;
 					}
@@ -168,7 +174,7 @@ namespace Foundation_GameTemplate
 					new User()
 					{
 						username = username,
-						color = bgColour,
+						color = AvatarGenerator.RandomLight(),
 						channel = channel,
 						uColor = uColor
 					});
@@ -310,7 +316,7 @@ namespace Foundation_GameTemplate
 	{
 		public string username;
 		public string message;
-		public string color;
+		public Color color;
 		public string channel;
 		public string uColor;
 		public float yOffset;
