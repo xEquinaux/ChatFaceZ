@@ -5,6 +5,7 @@ namespace ChatFaceZ
 		[STAThread]
 		static void Main()
 		{
+			new Chat_tacular.Login().ShowDialog();
 			Application.Run(new Form1());
 		}
 	}

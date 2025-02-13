@@ -26,15 +26,17 @@ namespace TestConsole
 	
         public Bot()
         {
-            ConnectionCredentials credentials = new ConnectionCredentials("Trotbot", "oauth:9ietz5sy9dd5q3ya9oe6ka8rbvc2mu");
-	    var clientOptions = new ClientOptions
+            ConnectionCredentials credentials = new ConnectionCredentials(
+                Chat_tacular.App.username, 
+                Chat_tacular.App.auth);
+    	    var clientOptions = new ClientOptions
                 {
                     MessagesAllowedInPeriod = 750,
                     ThrottlingPeriod = TimeSpan.FromSeconds(30)
                 };
             WebSocketClient customClient = new WebSocketClient(clientOptions);
             client = new TwitchClient(customClient);
-            client.Initialize(credentials, "Trotbot");
+            client.Initialize(credentials, Chat_tacular.App.channel);
 
             client.OnLog += Client_OnLog;
             client.OnJoinedChannel += Client_OnJoinedChannel;
@@ -58,9 +60,8 @@ namespace TestConsole
   
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            return;
-            Console.WriteLine("Hey guys! I am a bot connected via TwitchLib!");
-            client.SendMessage(e.Channel, "Hey guys! I am a bot connected via TwitchLib!");
+            Console.WriteLine("Hey guys! I am an application connected via TwitchLib!");
+            client.SendMessage(e.Channel, "Hey guys! I am an application connected via TwitchLib!");
         }
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)

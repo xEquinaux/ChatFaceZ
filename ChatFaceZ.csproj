@@ -11,10 +11,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Chat_tacular\ImageBase.cs" />
+    <Compile Remove="Chat_tacular\Program.cs" />
+    <Compile Remove="Chat_tacular\Setting2.xaml.cs" />
+    <Compile Remove="Chat_tacular\Settings.cs" />
+    <Compile Remove="Chat_tacular\Validate.cs" />
     <Compile Remove="CirclePrefect.Wpf.Surface.DirectTerminal.cs" />
     <Compile Remove="CirclePrefect.Wpf.Surface.Scroll.cs" />
     <Compile Remove="DirectTerminal.cs" />
     <Compile Remove="Scroll.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Chat_tacular\bluepane.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Chat_tacular\ImageBase.xaml" />
+    <Page Remove="Chat_tacular\Setting2.xaml" />
+    <Page Remove="Chat_tacular\Settings.xaml" />
+    <Page Remove="Chat_tacular\Validate.xaml" />
   </ItemGroup>
 
   <ItemGroup>
