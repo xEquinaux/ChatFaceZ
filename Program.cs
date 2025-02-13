@@ -10,6 +10,7 @@ using System.Windows.Media;
 using Brushes = System.Windows.Media.Brushes;
 using TestConsole;
 using System.Windows.Shapes;
+using ChatFaceZ;
 
 namespace Foundation_GameTemplate
 {
@@ -32,8 +33,9 @@ namespace Foundation_GameTemplate
 		int num = 0;
 		int retry = 10;
 		double maxWidth = 300;
-		Scroll scroll = new Scroll(new Rectangle(0, 0, Program.Width, Program.Height));
+		//Scroll scroll = new Scroll(new Rectangle(0, 0, Program.Width, Program.Height));
 		int remove = 100;
+		float yOffset = 0;
 
 		internal Main(int sx, int sy, int w, int y, string title, int bpp) : base(sx, sy, w, y, title, bpp)
 		{
@@ -77,8 +79,6 @@ namespace Foundation_GameTemplate
 		protected override void Draw(DrawingArgs e)
 		{
 			string font = "Arial";
-			float yOffset = 0;
-			float yOffsetAdd = 30f;
 			string[] array = new string[this.message.Count];
 			this.message.CopyTo(array, 0);
 					
@@ -90,20 +90,22 @@ namespace Foundation_GameTemplate
 						
 				List<string> wrappedText = WrapText(array[i], maxWidth, "Arial", 16f);
 				bool once = false;
+				int whoAmI = 0;
 				foreach (var line in wrappedText)
 				{
 					if (!once)
-					{ 
+					{
 						once = true;
-						e.rewBatch.Draw(REW.Create((int)(maxWidth * 1.2f), 20, Color.FromArgb(30, 30, 30), Ext.GetFormat(4)), 62, (int)yOffset + 8);
-						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset, (int)maxWidth * 2, Program.Height, Color.Purple, 12f);
-						craigomatic.sample.AvatarGenerator.Generate(e.rewBatch, user[i].username, user[i].channel, 10, (int)yOffset + 8, user[i].color, 40, 12);
+						e.rewBatch.Draw(REW.Create((int)(maxWidth * 1.2f), 20, Color.FromArgb(30, 30, 30), Ext.GetFormat(4)), 62, (int)yOffset + 8 - ScrollLogic.yCoord(message.Count));
+						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height, Color.Purple, 12f);
+						craigomatic.sample.AvatarGenerator.Generate(e.rewBatch, user[i].username, user[i].channel, 10, (int)yOffset + 8 - ScrollLogic.yCoord(message.Count), user[i].color, 40, 12);
 						yOffset += 20f;
 					}
-					e.rewBatch.DrawString(font, line, 50, (int)(yOffset), (int)maxWidth * 2, Program.Height);
+					e.rewBatch.DrawString(font, line, 50, (int)(yOffset) - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height);
 					yOffset += 25f;
 				}
 			}
+			yOffset = 0f;
 		}
 
 		protected override void Input(InputArgs e)
@@ -112,7 +114,7 @@ namespace Foundation_GameTemplate
 
 		protected override void Update(UpdateArgs e)
 		{
-			return; 
+			return;
 			//maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
 			
@@ -123,19 +125,19 @@ namespace Foundation_GameTemplate
 			set_Avatar("Test Console", "default", text);
 			set_Avatar("Test Console 4", "default", bigword);
 					
-			if (--remove <= 0)
+			if (--remove <= 20)
 			{
-				for (int i = 0; i < 50; i++)
+				for (int i = 0; i < 10; i++)
 				{ 
 					message.RemoveAt(i);
 					user.RemoveAt(i);
 				}
-				remove = 100;
+				remove = 20;
 			}
 
 			if (--retry <= 0)
 			{
-				message.Clear();
+				//message.Clear();
 				retry = 10;
 			}
 		}
@@ -143,6 +145,11 @@ namespace Foundation_GameTemplate
 		protected new bool Resize()
 		{
 			return false;
+		}
+
+		private int yCoord(int height, int i, int count, int boundsHeight, float value = 1f)
+		{
+			return height * i - (int)(value * (float)(boundsHeight + count * height));
 		}
 
 		public void set_Avatar(string username, string channel, string text)
@@ -300,6 +307,7 @@ namespace Foundation_GameTemplate
 		public string message;
 		public string color;
 		public string channel;
+		public float yOffset;
 		public REW avatar;
 	}
 }

@@ -11,6 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CirclePrefect.Wpf.Surface.DirectTerminal.cs" />
+    <Compile Remove="CirclePrefect.Wpf.Surface.Scroll.cs" />
     <Compile Remove="DirectTerminal.cs" />
     <Compile Remove="Scroll.cs" />
   </ItemGroup>
