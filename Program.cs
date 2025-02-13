@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Media;
 using Brushes = System.Windows.Media.Brushes;
 using TestConsole;
+using System.Windows.Shapes;
 
 namespace Foundation_GameTemplate
 {
@@ -32,6 +33,7 @@ namespace Foundation_GameTemplate
 		int retry = 10;
 		double maxWidth = 300;
 		Scroll scroll = new Scroll(new Rectangle(0, 0, Program.Width, Program.Height));
+		int remove = 100;
 
 		internal Main(int sx, int sy, int w, int y, string title, int bpp) : base(sx, sy, w, y, title, bpp)
 		{
@@ -76,17 +78,30 @@ namespace Foundation_GameTemplate
 		{
 			string font = "Arial";
 			float yOffset = 0;
+			float yOffsetAdd = 30f;
 			string[] array = new string[this.message.Count];
 			this.message.CopyTo(array, 0);
-			e.rewBatch.Draw(REW.Create(Program.Width, Program.Height, Color.Black, Ext.GetFormat(4)), 0, 0);
+					
+			e.rewBatch.Draw(REW.Create((int)Program.Width, Program.Height, Color.Black, Ext.GetFormat(4)), 0, 0);
+
 			for (int i = 0; i < array.Length; i++)
 			{
+				array[i] = array[i].Replace(user[i].username + ": ", "");
+						
 				List<string> wrappedText = WrapText(array[i], maxWidth, "Arial", 16f);
-				//e.rewBatch.Draw(user[i].avatar, 0, (int)yOffset + 12);
+				e.rewBatch.Draw(user[i].avatar, 10, (int)yOffset + 8);
+				bool once = false;
 				foreach (var line in wrappedText)
 				{
-					e.rewBatch.DrawString(font, line, 50, (int)yOffset, 400, Program.Height);
-					yOffset += 40;
+					if (!once)
+					{ 
+						once = true;
+						e.rewBatch.Draw(REW.Create((int)(maxWidth * 1.02f), 20, Color.FromArgb(30, 30, 30), Ext.GetFormat(4)), 62, (int)yOffset + 8);
+						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset, (int)maxWidth * 2, Program.Height, Color.Purple, 12f);
+						yOffset += 20f;
+					}
+					e.rewBatch.DrawString(font, line, 50, (int)(yOffset), (int)maxWidth * 2, Program.Height);
+					yOffset += 25f;
 				}
 			}
 		}
@@ -105,13 +120,23 @@ namespace Foundation_GameTemplate
 			//maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
 			
-			//set_Avatar("Test Console", "default");
-			message.Add(++num + " There was an oddity today while working with some integers in the code. " + num);
-
-			//	There was an oddity today while working with some integers in the code.
-			//	Therewasanodditytodaywhileworkingwithsomeintegersinthecode.
-
+			string text = ++num + " There was an oddity today while working with some integers in the code. " + num;
+			string word = " There was an oddity today while working with some integers in the code.";
+			string bigword = " Therewasanodditytodaywhileworkingwithsomeintegersinthecode.";
 			
+			set_Avatar("Test Console", "default", text);
+			set_Avatar("Test Console 4", "default", bigword);
+					
+			if (--remove <= 0)
+			{
+				for (int i = 0; i < 50; i++)
+				{ 
+					message.RemoveAt(i);
+					user.RemoveAt(i);
+				}
+				remove = 100;
+			}
+
 			if (--retry <= 0)
 			{
 				message.Clear();
@@ -124,7 +149,7 @@ namespace Foundation_GameTemplate
 			return false;
 		}
 
-		public void set_Avatar(string username, string channel)
+		public void set_Avatar(string username, string channel, string text)
 		{
             var user = this.user.FirstOrDefault(t => t.username == username);
             if (user != default)
@@ -136,11 +161,11 @@ namespace Foundation_GameTemplate
                 this.user.Add(
                     new User() 
                 { 
-                    avatar = REW.Extract(new craigomatic.sample.AvatarGenerator().Generate(username, channel, 40, 12), 32), 
+                    avatar = new craigomatic.sample.AvatarGenerator().Generate(username, channel, 40, 12), 
                     username = username 
                 });
             }
-            this.message.Add($"{username}: {channel}");
+            this.message.Add($"{username}: {text}");
             this.whoAmI++;
 		}
 
@@ -188,7 +213,7 @@ namespace Foundation_GameTemplate
 					add = "";
 				}
 			}
-			line.Add(text.Substring(Math.Min(text.Length, num3)));
+			//line.Add(text.Substring(Math.Min(text.Length, num3)));
 
 			return line;
 		}
@@ -237,7 +262,7 @@ namespace Foundation_GameTemplate
 			{
 				if (w.Length * emSize > pixels)
 				{
-					return WrapText(text, pixels, emSize);
+					return WrapText(text, pixels * 2, emSize);
 				}
 			}
 
