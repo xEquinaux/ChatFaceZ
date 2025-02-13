@@ -11,6 +11,7 @@ using Brushes = System.Windows.Media.Brushes;
 using TestConsole;
 using System.Windows.Shapes;
 using ChatFaceZ;
+using ColorConverter = System.Drawing.ColorConverter;
 
 namespace Foundation_GameTemplate
 {
@@ -81,13 +82,13 @@ namespace Foundation_GameTemplate
 			string font = "Arial";
 			string[] array = new string[this.message.Count];
 			this.message.CopyTo(array, 0);
-					
+
 			e.rewBatch.Draw(REW.Create((int)Program.Width, Program.Height, Color.Black, Ext.GetFormat(4)), 0, 0);
 
 			for (int i = 0; i < array.Length; i++)
 			{
 				array[i] = array[i].Replace(user[i].username + ": ", "");
-						
+
 				List<string> wrappedText = WrapText(array[i], maxWidth, "Arial", 16f);
 				bool once = false;
 				int whoAmI = 0;
@@ -97,7 +98,7 @@ namespace Foundation_GameTemplate
 					{
 						once = true;
 						e.rewBatch.Draw(REW.Create((int)(maxWidth * 1.2f), 20, Color.FromArgb(30, 30, 30), Ext.GetFormat(4)), 62, (int)yOffset + 8 - ScrollLogic.yCoord(message.Count));
-						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height, Color.Purple, 12f);
+						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height, (Color)new ColorConverter().ConvertFromString(user[i].uColor), 12f);
 						craigomatic.sample.AvatarGenerator.Generate(e.rewBatch, user[i].username, user[i].channel, 10, (int)yOffset + 8 - ScrollLogic.yCoord(message.Count), user[i].color, 40, 12);
 						yOffset += 20f;
 					}
@@ -117,18 +118,18 @@ namespace Foundation_GameTemplate
 			return;
 			//maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
-			
+
 			string text = ++num + " There was an oddity today while working with some integers in the code. " + num;
 			string word = " There was an oddity today while working with some integers in the code.";
 			string bigword = " Therewasanodditytodaywhileworkingwithsomeintegersinthecode.";
-			
-			set_Avatar("Test Console", "default", text);
-			set_Avatar("Test Console 4", "default", bigword);
-					
+
+			//set_Avatar("Test Console", "default", text);
+			//set_Avatar("Test Console 4", "default", bigword);
+
 			if (--remove <= 20)
 			{
 				for (int i = 0; i < 10; i++)
-				{ 
+				{
 					message.RemoveAt(i);
 					user.RemoveAt(i);
 				}
@@ -152,27 +153,28 @@ namespace Foundation_GameTemplate
 			return height * i - (int)(value * (float)(boundsHeight + count * height));
 		}
 
-		public void set_Avatar(string username, string channel, string text)
+		public void set_Avatar(string username, string channel, string text, string uColor)
 		{
-            var user = this.user.FirstOrDefault(t => t.username == username);
-            if (user != default)
-            {
-                this.user.Add(user);
-            }
-            else
-            {
+			var user = this.user.FirstOrDefault(t => t.username == username);
+			if (user != default)
+			{
+				this.user.Add(user);
+			}
+			else
+			{
 				var randomIndex = new Random().Next(0, craigomatic.sample.AvatarGenerator._BackgroundColours.Count - 1);
 				var bgColour = craigomatic.sample.AvatarGenerator._BackgroundColours[randomIndex];
-                this.user.Add(
-                    new User() 
-                { 
-                    username = username,
-					color = bgColour,
-					channel = channel
-                });
-            }
-            this.message.Add($"{username}: {text}");
-            this.whoAmI++;
+				this.user.Add(
+					new User()
+					{
+						username = username,
+						color = bgColour,
+						channel = channel,
+						uColor = uColor
+					});
+			}
+			this.message.Add($"{username}: {text}");
+			this.whoAmI++;
 		}
 
 		private List<string> WrapText(string text, double maxWidth, float emSize)
@@ -194,7 +196,7 @@ namespace Foundation_GameTemplate
 						for (int i = 0; i < array2.Length; i++)
 						{
 							num2 += array2[i].Length;
-							add += array2[i] + " ";
+							add += array2[i] + "_WRAP_";
 							num3 += array2[i].Length;
 						}
 					}
@@ -207,11 +209,11 @@ namespace Foundation_GameTemplate
 				}
 				if (num2 * emSize > maxWidth)
 				{
-					string[] array = add.Split(' ');
+					string[] array = add.Split("_WRAP_");
 					for (int i = 0; i < array?.Length; i++)
 					{
 						if (!string.IsNullOrWhiteSpace(array[i]))
-						{ 
+						{
 							line.Add(array[i]);
 						}
 					}
@@ -219,7 +221,10 @@ namespace Foundation_GameTemplate
 					add = "";
 				}
 			}
-			//line.Add(text.Substring(Math.Min(text.Length, num3)));
+			if (!string.IsNullOrWhiteSpace(add))
+			{ 
+				line.Add(add);
+			}
 
 			return line;
 		}
@@ -307,6 +312,7 @@ namespace Foundation_GameTemplate
 		public string message;
 		public string color;
 		public string channel;
+		public string uColor;
 		public float yOffset;
 		public REW avatar;
 	}

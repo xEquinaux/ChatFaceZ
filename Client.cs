@@ -65,7 +65,7 @@ namespace TestConsole
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            Main.Instance.set_Avatar(e.ChatMessage.Username, e.ChatMessage.Channel, e.ChatMessage.Message);
+            Main.Instance.set_Avatar(e.ChatMessage.Username, e.ChatMessage.Channel, e.ChatMessage.Message, e.ChatMessage.ColorHex == "" ? "#ffffff" : e.ChatMessage.ColorHex );
             if (e.ChatMessage.Message.Contains("badword"))
                 client.TimeoutUser(e.ChatMessage.Channel, e.ChatMessage.Username, TimeSpan.FromMinutes(30), "Bad word! 30 minute timeout!");
         }
