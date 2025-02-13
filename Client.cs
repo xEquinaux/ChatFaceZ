@@ -1,5 +1,5 @@
 ﻿using Foundation_GameTemplate;
-using FoundationR;
+using REWD.FoundationR;
 using System;
 using TwitchLib.Client;
 using TwitchLib.Client.Enums;
@@ -64,18 +64,7 @@ namespace TestConsole
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            var user = Main.Instance.user.FirstOrDefault(t => t.username == e.ChatMessage.Username);
-            if (user != default)
-            {
-                Main.Instance.user.Add(user);
-            }
-            else
-            {
-                Main.Instance.user.Add(new User() { avatar = GetAvatar(e.ChatMessage.Username, e.ChatMessage.Channel), username = e.ChatMessage.Username });
-            }
-            Main.Instance.message.Add($"{e.ChatMessage.Username}: {e.ChatMessage.Message}");
-            Main.Instance.whoAmI++;
-
+            Main.Instance.set_Avatar(e.ChatMessage.Username, e.ChatMessage.Channel);
             if (e.ChatMessage.Message.Contains("badword"))
                 client.TimeoutUser(e.ChatMessage.Channel, e.ChatMessage.Username, TimeSpan.FromMinutes(30), "Bad word! 30 minute timeout!");
         }
@@ -93,10 +82,5 @@ namespace TestConsole
             else
                 client.SendMessage(e.Channel, $"Welcome {e.Subscriber.DisplayName} to the substers! You just earned 500 points!");
         }
-
-        private REW GetAvatar(string username, string channel)
-		{
-			return REW.Extract(new craigomatic.sample.AvatarGenerator().Generate(username, channel), 32);
-		}
     }
 }

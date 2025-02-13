@@ -1,5 +1,6 @@
 ﻿using System;
-using FoundationR;
+using REWD;
+using REWD.FoundationR;
 using Color = System.Drawing.Color;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using tUserInterface.ModUI;
@@ -15,35 +16,27 @@ namespace Foundation_GameTemplate
 	{
 		static int StartX => 0;
 		static int StartY => 0;
-		internal static int Width => 640;
-		internal static int Height => 480;
+		internal static int Width => 800;
+		internal static int Height => 600;
 		static int BitsPerPixel => 32;
 		static string Title = "Foundation_GameTemplate";
-		public static Main m;
-		static void Launch(string[] args)
-		{
-			new Main().Run(SurfaceType.WindowHandle_Loop, new FoundationR.Surface(StartX, StartY, Width, Height, Title, BitsPerPixel)); ;
-		}
-		public static void Run(bool noBorder = false)
-		{
-			new Main().Run(noBorder ? SurfaceType.WindowHandle_Loop_NoBorder : SurfaceType.WindowHandle_Loop, new FoundationR.Surface(StartX, StartY, Width, Height, Title, BitsPerPixel)); ;
-		}
 	}
 	public class Main : Foundation
 	{
-		internal static Main? Instance;
+		public static Main Instance;
+		bool init;
 		public IList<string> message = new List<string>();
 		public IList<User> user = new List<User>();
 		public int whoAmI;
 		int num = 0;
 		int retry = 10;
-		double maxWidth = 100;
+		double maxWidth = 300;
 		Scroll scroll = new Scroll(new Rectangle(0, 0, Program.Width, Program.Height));
 
-		internal Main()
+		internal Main(int sx, int sy, int w, int y, string title, int bpp) : base(sx, sy, w, y, title, bpp)
 		{
-			Instance = this;
 			new TestConsole.Bot();
+			Start(new Surface(sx, sy, w, y, title, bpp));
 		}
 
 		public override void RegisterHooks()
@@ -59,53 +52,60 @@ namespace Foundation_GameTemplate
 			Foundation.CameraEvent += Camera;
 		}
 
-		protected void Camera(CameraArgs e)
+		protected override void Camera(CameraArgs e)
 		{
 		}
 
-		protected void PreDraw(PreDrawArgs e)
+		protected override void PreDraw(PreDrawArgs e)
 		{
 		}
 
-		protected void MainMenu(DrawingArgs e)
+		protected override void MainMenu(DrawingArgs e)
 		{
 		}
 
-		protected void LoadResources()
+		protected override void LoadResources()
 		{
 		}
 
-		protected void Initialize(InitializeArgs e)
+		protected override void Initialize(InitializeArgs e)
 		{
 		}
 
-		protected void Draw(DrawingArgs e)
+		protected override void Draw(DrawingArgs e)
 		{
 			string font = "Arial";
 			float yOffset = 0;
 			string[] array = new string[this.message.Count];
 			this.message.CopyTo(array, 0);
+			e.rewBatch.Draw(REW.Create(Program.Width, Program.Height, Color.Black, Ext.GetFormat(4)), 0, 0);
 			for (int i = 0; i < array.Length; i++)
 			{
-				List<string> wrappedText = WrapText(array[i], 200d, "Arial", 16f);
-				e.rewBatch.Draw(user[i].avatar, 0, (int)yOffset + 12);
+				List<string> wrappedText = WrapText(array[i], maxWidth, "Arial", 16f);
+				//e.rewBatch.Draw(user[i].avatar, 0, (int)yOffset + 12);
 				foreach (var line in wrappedText)
 				{
-					e.rewBatch.DrawString(font, line, 50, (int)yOffset, 400, 1000);
+					e.rewBatch.DrawString(font, line, 50, (int)yOffset, 400, Program.Height);
 					yOffset += 40;
 				}
 			}
 		}
 
-		protected void Input(InputArgs e)
+		protected override void Input(InputArgs e)
 		{
 		}
 
-		protected void Update(UpdateArgs e)
+		protected override void Update(UpdateArgs e)
 		{
-			return;
-			maxWidth = 200;
+			if (!init)
+			{
+				init = true;
+				Instance = this;
+			}
+			//maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
+			
+			//set_Avatar("Test Console", "default");
 			message.Add(++num + " There was an oddity today while working with some integers in the code. " + num);
 
 			//	There was an oddity today while working with some integers in the code.
@@ -124,9 +124,24 @@ namespace Foundation_GameTemplate
 			return false;
 		}
 
-		public void AddMessage(REW avatar, string username, string message)
+		public void set_Avatar(string username, string channel)
 		{
-
+            var user = this.user.FirstOrDefault(t => t.username == username);
+            if (user != default)
+            {
+                this.user.Add(user);
+            }
+            else
+            {
+                this.user.Add(
+                    new User() 
+                { 
+                    avatar = REW.Extract(new craigomatic.sample.AvatarGenerator().Generate(username, channel, 40, 12), 32), 
+                    username = username 
+                });
+            }
+            this.message.Add($"{username}: {channel}");
+            this.whoAmI++;
 		}
 
 		private List<string> WrapText(string text, double maxWidth, float emSize)

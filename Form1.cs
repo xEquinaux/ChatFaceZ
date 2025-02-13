@@ -1,3 +1,5 @@
+using Foundation_GameTemplate;
+
 namespace ChatFaceZ
 {
 	public partial class Form1 : Form
@@ -9,7 +11,7 @@ namespace ChatFaceZ
 
 		private void button3_Click(object sender, EventArgs e)
 		{
-			Foundation_GameTemplate.Program.Run(true);
+			new Main(0, 0, 800, 600, "Demo", 32);
 		}
 	}
 }
