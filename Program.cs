@@ -89,15 +89,15 @@ namespace Foundation_GameTemplate
 				array[i] = array[i].Replace(user[i].username + ": ", "");
 						
 				List<string> wrappedText = WrapText(array[i], maxWidth, "Arial", 16f);
-				e.rewBatch.Draw(user[i].avatar, 10, (int)yOffset + 8);
 				bool once = false;
 				foreach (var line in wrappedText)
 				{
 					if (!once)
 					{ 
 						once = true;
-						e.rewBatch.Draw(REW.Create((int)(maxWidth * 1.02f), 20, Color.FromArgb(30, 30, 30), Ext.GetFormat(4)), 62, (int)yOffset + 8);
+						e.rewBatch.Draw(REW.Create((int)(maxWidth * 1.2f), 20, Color.FromArgb(30, 30, 30), Ext.GetFormat(4)), 62, (int)yOffset + 8);
 						e.rewBatch.DrawString(font, user[i].username, 50, (int)yOffset, (int)maxWidth * 2, Program.Height, Color.Purple, 12f);
+						craigomatic.sample.AvatarGenerator.Generate(e.rewBatch, user[i].username, user[i].channel, 10, (int)yOffset + 8, user[i].color, 40, 12);
 						yOffset += 20f;
 					}
 					e.rewBatch.DrawString(font, line, 50, (int)(yOffset), (int)maxWidth * 2, Program.Height);
@@ -158,11 +158,14 @@ namespace Foundation_GameTemplate
             }
             else
             {
+				var randomIndex = new Random().Next(0, craigomatic.sample.AvatarGenerator._BackgroundColours.Count - 1);
+				var bgColour = craigomatic.sample.AvatarGenerator._BackgroundColours[randomIndex];
                 this.user.Add(
                     new User() 
                 { 
-                    avatar = new craigomatic.sample.AvatarGenerator().Generate(username, channel, 40, 12), 
-                    username = username 
+                    username = username,
+					color = bgColour,
+					channel = channel
                 });
             }
             this.message.Add($"{username}: {text}");
@@ -299,6 +302,8 @@ namespace Foundation_GameTemplate
 	{
 		public string username;
 		public string message;
+		public string color;
+		public string channel;
 		public REW avatar;
 	}
 }
