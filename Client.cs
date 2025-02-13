@@ -58,6 +58,7 @@ namespace TestConsole
   
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
+            return;
             Console.WriteLine("Hey guys! I am a bot connected via TwitchLib!");
             client.SendMessage(e.Channel, "Hey guys! I am a bot connected via TwitchLib!");
         }
@@ -71,12 +72,14 @@ namespace TestConsole
         
         private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
         {
+            return;
             if (e.WhisperMessage.Username == "my_friend")
                 client.SendWhisper(e.WhisperMessage.Username, "Hey! Whispers are so cool!!");
         }
         
         private void Client_OnNewSubscriber(object sender, OnNewSubscriberArgs e)
         {
+            return;
             if (e.Subscriber.SubscriptionPlan == SubscriptionPlan.Prime)
                 client.SendMessage(e.Channel, $"Welcome {e.Subscriber.DisplayName} to the substers! You just earned 500 points! So kind of you to use your Twitch Prime on this channel!");
             else

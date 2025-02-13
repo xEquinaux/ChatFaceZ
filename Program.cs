@@ -37,8 +37,6 @@ namespace Foundation_GameTemplate
 
 		internal Main(int sx, int sy, int w, int y, string title, int bpp) : base(sx, sy, w, y, title, bpp)
 		{
-			new TestConsole.Bot();
-			Start(new Surface(sx, sy, w, y, title, bpp));
 		}
 
 		public override void RegisterHooks()
@@ -72,6 +70,8 @@ namespace Foundation_GameTemplate
 
 		protected override void Initialize(InitializeArgs e)
 		{
+			Instance = this;
+			new TestConsole.Bot();
 		}
 
 		protected override void Draw(DrawingArgs e)
@@ -112,11 +112,7 @@ namespace Foundation_GameTemplate
 
 		protected override void Update(UpdateArgs e)
 		{
-			if (!init)
-			{
-				init = true;
-				Instance = this;
-			}
+			return; 
 			//maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
 			
