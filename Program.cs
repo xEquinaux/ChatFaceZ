@@ -3,7 +3,6 @@ using REWD;
 using REWD.FoundationR;
 using Color = System.Drawing.Color;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using tUserInterface.ModUI;
 using System.Globalization;
 using System.Text;
 using System.Windows.Media;
@@ -13,8 +12,24 @@ using System.Windows.Shapes;
 using ChatFaceZ;
 using ColorConverter = System.Drawing.ColorConverter;
 using craigomatic.sample;
+using Microsoft.Xna.Framework.Input;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
+using System.Diagnostics;
+using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
+using ChatFaceZ.tUserInterface;
+using System.Runtime;
+using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Forms;
+using TextBox = ChatFaceZ.tUserInterface.TextBox;
+using Button = ChatFaceZ.tUserInterface.Button;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using ListBox = ChatFaceZ.tUserInterface.ListBox;
+using System.Drawing;
 
-namespace Foundation_GameTemplate
+namespace ChatFaceZ
 {
 	public class Program
 	{
@@ -27,7 +42,15 @@ namespace Foundation_GameTemplate
 	}
 	public class Main : Foundation
 	{
+		public static Vector2 MouseScreen;
 		public static Main Instance;
+		public static bool MouseLeft => getMouse.LeftButton == ButtonState.Pressed;
+		public static bool MouseRight => getMouse.RightButton == ButtonState.Pressed;
+		static MouseState getMouse => Mouse.GetState();
+		public static string AppFont = "Arial";
+		public static Color AppChatTextColor = Color.White;
+		public static Color AppBGColor = Color.Black;
+		
 		bool init;
 		public IList<string> message = new List<string>();
 		public IList<User> user = new List<User>();
@@ -35,11 +58,25 @@ namespace Foundation_GameTemplate
 		int num = 0;
 		int retry = 10;
 		double maxWidth = 300;
-		//Scroll scroll = new Scroll(new Rectangle(0, 0, Program.Width, Program.Height));
+		Rectangle settings = new Rectangle(Program.Width / 2 + 100, 0, Program.Width / 2 - 100, 150);
+		TextBox textboxFont;
+		Scroll scroll;
+		Button[] button;
+		ListBox listbox;
 		int remove = 100;
 		float yOffset = 0;
+		int OFFSET = 30;
 
-		internal Main(int sx, int sy, int w, int y, string title, int bpp) : base(sx, sy, w, y, title, bpp)
+		protected class ButtonType
+		{
+			public static int
+				ChatTextColor = 0,
+				BackgroundColor = 1,
+				Bold = 2,
+				Italic = 3;
+		}
+
+		internal Main(int sx, int sy, int w, int y, string title, int bpp, bool noBorder) : base(sx, sy, w, y, title, bpp, noBorder)
 		{
 		}
 
@@ -75,22 +112,39 @@ namespace Foundation_GameTemplate
 		protected override void Initialize(InitializeArgs e)
 		{
 			Instance = this;
+			scroll = new Scroll(settings);
+			listbox = new ListBox(settings, scroll, button = new Button[]
+			{
+				new Button("Chat text color", new Rectangle(4, 4, 50, 24)) { active = true },
+				new Button("Background color", new Rectangle(4, 4, 50, 24)) { active = true },
+				//new Button("Bold", new Rectangle(4, 4, 50, 24)),
+				//new Button("Italic", new Rectangle(4, 4, 50, 24)),
+			});
+			textboxFont = new TextBox(new Rectangle(settings.X, settings.Bottom + 8, settings.Width, 28), Color.Blue);
+			textboxFont.text = "Arial";
 			new TestConsole.Bot();
 		}
 
 		protected override void Draw(DrawingArgs e)
 		{
-			string font = "Arial";
+			listbox.active = true;
+			textboxFont.active = true;
+
+			e.rewBatch.Draw(REW.Create((int)Program.Width, Program.Height, AppBGColor, Ext.GetFormat(4)), 0, 0);
+			
+			string font = AppFont;
 			string[] array = new string[this.message.Count];
 			this.message.CopyTo(array, 0);
 
-			e.rewBatch.Draw(REW.Create((int)Program.Width, Program.Height, Color.Black, Ext.GetFormat(4)), 0, 0);
+			//listbox.Draw(e.rewBatch, font, REW.Create(listbox.hitbox.Width, listbox.hitbox.Height, Color.Gray, Ext.GetFormat(4)));
+			//scroll.Draw(e.rewBatch, REW.Create(scroll.hitbox.Width, scroll.hitbox.Height, Color.White, Ext.GetFormat(4)), Color.White);
+			//textboxFont.DrawText(e.rewBatch, REW.Create(textboxFont.box.Width, textboxFont.box.Height, Color.Green, Ext.GetFormat(4)), font);
 
 			for (int i = 0; i < array.Length; i++)
 			{
 				array[i] = array[i].Replace(user[i].username + ": ", "");
 
-				List<string> wrappedText = WrapText(array[i], maxWidth, "Arial", 16f);
+				List<string> wrappedText = WrapText(array[i], maxWidth, font, 16f);
 				bool once = false;
 				int whoAmI = 0;
 				foreach (var line in wrappedText)
@@ -108,7 +162,7 @@ namespace Foundation_GameTemplate
 						craigomatic.sample.AvatarGenerator.Generate(e.rewBatch, user[i].username, user[i].channel, 10, (int)yOffset + 8 - ScrollLogic.yCoord(message.Count), user[i].color, 40, 12);
 						yOffset += 20f;
 					}
-					e.rewBatch.DrawString(font, line, 50, (int)(yOffset) - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height);
+					e.rewBatch.DrawString(font, line, 50, (int)(yOffset) - ScrollLogic.yCoord(message.Count), (int)maxWidth * 2, Program.Height, AppChatTextColor, 12f);
 					yOffset += 25f;
 				}
 			}
@@ -117,10 +171,38 @@ namespace Foundation_GameTemplate
 
 		protected override void Input(InputArgs e)
 		{
+			if (IsKeyDown(Keys.Escape))
+			{
+				Process.GetCurrentProcess().CloseMainWindow();
+			}
+			return;
+			var mouse = Mouse.GetState();
+			MouseScreen = new Vector2(mouse.X, mouse.Y);
+
+			listbox.Update();
+			textboxFont.UpdateInput();
+
+			AppFont = textboxFont.text;
+			if (button[ButtonType.ChatTextColor].LeftClick())
+			{
+				var dialog = new ColorDialog();
+				dialog.ShowDialog();
+				AppChatTextColor = dialog.Color;
+			}
+			if (button[ButtonType.BackgroundColor].LeftClick())
+			{
+				var dialog = new ColorDialog();
+				dialog.ShowDialog();
+				AppBGColor = dialog.Color;
+			}
 		}
 
 		protected override void Update(UpdateArgs e)
 		{
+			
+
+
+			
 			return;
 			//maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
@@ -152,6 +234,11 @@ namespace Foundation_GameTemplate
 		protected new bool Resize()
 		{
 			return false;
+		}
+
+		public bool IsKeyDown(Keys k)
+		{
+			return Keyboard.GetState().IsKeyDown(k);
 		}
 
 		private int yCoord(int height, int i, int count, int boundsHeight, float value = 1f)

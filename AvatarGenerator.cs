@@ -36,7 +36,7 @@ namespace craigomatic.sample
 				dimensions, 
 				color, 
 				Ext.GetFormat(4)), x, y);
-			rew.DrawString("Arial", avatarString, x - 4, y + 2, dimensions, dimensions, Color.Black, fontSize);
+			rew.DrawString(ChatFaceZ.Main.AppFont, avatarString, x - 4, y + 2, dimensions, dimensions, Color.Black, fontSize);
 		}
 	}
 }

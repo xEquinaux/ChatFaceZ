@@ -5,7 +5,6 @@
     <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
 	<UseWPF>true</UseWPF>
 	<LangVersion>11</LangVersion>
   </PropertyGroup>
@@ -44,9 +43,6 @@
   <ItemGroup>
     <Reference Include="FNA">
       <HintPath>FNA.dll</HintPath>
-    </Reference>
-    <Reference Include="tUserInterface">
-      <HintPath>tUserInterface.dll</HintPath>
     </Reference>
   </ItemGroup>
 

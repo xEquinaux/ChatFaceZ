@@ -1,3 +1,5 @@
+using System;
+
 namespace ChatFaceZ
 {
 	internal static class Launch
@@ -6,7 +8,7 @@ namespace ChatFaceZ
 		static void Main()
 		{
 			new Chat_tacular.Login().ShowDialog();
-			Application.Run(new Form1());
+			new Main(0, 0, 800, 600, "Chat FaceZ", 32, true);
 		}
 	}
 }
