@@ -47,14 +47,10 @@ namespace ChatFaceZ
 	{
 		public static Vector2 MouseScreen;
 		public static Main? Instance;
-		public static bool MouseLeft;
-		public static bool MouseRight;
-		static MouseDevice getMouse => System.Windows.Input.Mouse.PrimaryDevice;
 		public static string AppFont = "Arial";
 		public static Color AppChatTextColor = Color.White;
 		public static Color AppBGColor = Color.Black;
 		
-		bool init;
 		public IList<string> message = new List<string>();
 		public IList<User> user = new List<User>();
 		public int whoAmI;
@@ -68,8 +64,7 @@ namespace ChatFaceZ
 		ListBox listbox;
 		int remove = 100;
 		float yOffset = 0;
-		int OFFSET = 30;
-
+		
 		protected class ButtonType
 		{
 			public static int
