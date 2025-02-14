@@ -12,7 +12,6 @@ using System.Windows.Shapes;
 using ChatFaceZ;
 using ColorConverter = System.Drawing.ColorConverter;
 using craigomatic.sample;
-using Microsoft.Xna.Framework.Input;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
@@ -28,6 +27,10 @@ using Button = ChatFaceZ.tUserInterface.Button;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using ListBox = ChatFaceZ.tUserInterface.ListBox;
 using System.Drawing;
+using System.Windows.Input;
+using System.Printing;
+using Microsoft.Xna.Framework.Input;
+using System.Drawing.Drawing2D;
 
 namespace ChatFaceZ
 {
@@ -38,15 +41,15 @@ namespace ChatFaceZ
 		internal static int Width => 800;
 		internal static int Height => 600;
 		static int BitsPerPixel => 32;
-		static string Title = "Foundation_GameTemplate";
+		public static string Title = "Demo";
 	}
 	public class Main : Foundation
 	{
 		public static Vector2 MouseScreen;
-		public static Main Instance;
-		public static bool MouseLeft => getMouse.LeftButton == ButtonState.Pressed;
-		public static bool MouseRight => getMouse.RightButton == ButtonState.Pressed;
-		static MouseState getMouse => Mouse.GetState();
+		public static Main? Instance;
+		public static bool MouseLeft;
+		public static bool MouseRight;
+		static MouseDevice getMouse => System.Windows.Input.Mouse.PrimaryDevice;
 		public static string AppFont = "Arial";
 		public static Color AppChatTextColor = Color.White;
 		public static Color AppBGColor = Color.Black;
@@ -115,8 +118,8 @@ namespace ChatFaceZ
 			scroll = new Scroll(settings);
 			listbox = new ListBox(settings, scroll, button = new Button[]
 			{
-				new Button("Chat text color", new Rectangle(4, 4, 50, 24)) { active = true },
-				new Button("Background color", new Rectangle(4, 4, 50, 24)) { active = true },
+				new Button("Chat text color (c)", new Rectangle(4, 4, 50, 24)) { active = true },
+				new Button("Background color (b)", new Rectangle(4, 4, 50, 24)) { active = true },
 				//new Button("Bold", new Rectangle(4, 4, 50, 24)),
 				//new Button("Italic", new Rectangle(4, 4, 50, 24)),
 			});
@@ -136,9 +139,9 @@ namespace ChatFaceZ
 			string[] array = new string[this.message.Count];
 			this.message.CopyTo(array, 0);
 
-			//listbox.Draw(e.rewBatch, font, REW.Create(listbox.hitbox.Width, listbox.hitbox.Height, Color.Gray, Ext.GetFormat(4)));
-			//scroll.Draw(e.rewBatch, REW.Create(scroll.hitbox.Width, scroll.hitbox.Height, Color.White, Ext.GetFormat(4)), Color.White);
-			//textboxFont.DrawText(e.rewBatch, REW.Create(textboxFont.box.Width, textboxFont.box.Height, Color.Green, Ext.GetFormat(4)), font);
+			listbox.Draw(e.rewBatch, font, REW.Create(listbox.hitbox.Width, listbox.hitbox.Height, Color.Gray, Ext.GetFormat(4)));
+			scroll.Draw(e.rewBatch, REW.Create(scroll.hitbox.Width, scroll.hitbox.Height, Color.White, Ext.GetFormat(4)), Color.White);
+			textboxFont.DrawText(e.rewBatch, REW.Create(textboxFont.box.Width, textboxFont.box.Height, Color.Green, Ext.GetFormat(4)), font);
 
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -171,25 +174,26 @@ namespace ChatFaceZ
 
 		protected override void Input(InputArgs e)
 		{
-			if (IsKeyDown(Keys.Escape))
+			MouseLeft = Foundation.MouseLeft;
+			MouseRight = Foundation.MouseRight;
+
+			if (Foundation.KeyDown(Key.Escape))
 			{
 				Process.GetCurrentProcess().CloseMainWindow();
 			}
-			return;
-			var mouse = Mouse.GetState();
-			MouseScreen = new Vector2(mouse.X, mouse.Y);
 
-			listbox.Update();
-			textboxFont.UpdateInput();
+			//listbox.Update();				   
+			//textboxFont.UpdateInput();
+			textboxFont.text = "Arial";
 
 			AppFont = textboxFont.text;
-			if (button[ButtonType.ChatTextColor].LeftClick())
+			if (Foundation.KeyDown(Key.C))
 			{
 				var dialog = new ColorDialog();
 				dialog.ShowDialog();
 				AppChatTextColor = dialog.Color;
 			}
-			if (button[ButtonType.BackgroundColor].LeftClick())
+			if (Foundation.KeyDown(Key.B))
 			{
 				var dialog = new ColorDialog();
 				dialog.ShowDialog();
@@ -199,10 +203,6 @@ namespace ChatFaceZ
 
 		protected override void Update(UpdateArgs e)
 		{
-			
-
-
-			
 			return;
 			//maxWidth = 200;
 			Task.WaitAll(Task.Delay(1000));
@@ -238,7 +238,7 @@ namespace ChatFaceZ
 
 		public bool IsKeyDown(Keys k)
 		{
-			return Keyboard.GetState().IsKeyDown(k);
+			return Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(k);
 		}
 
 		private int yCoord(int height, int i, int count, int boundsHeight, float value = 1f)

@@ -2,12 +2,12 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System.Linq;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Color = System.Drawing.Color;
 using ChatFaceZ;
 using REWD.FoundationR;
+using System.Windows.Input;
 
 namespace ChatFaceZ.tUserInterface
 {
@@ -86,9 +86,9 @@ namespace ChatFaceZ.tUserInterface
 					}
 					if (textColor == null || textColor.Length != item.Length)
 					{
-						rew.DrawString(font, item[n].text, hitbox.X + xOffset, box.Y + yOffset, hitbox.Width, hitbox.Height, Color.White, 12f);
+						rew.DrawString(font, item[n].text, hitbox.X + xOffset, box.Y + yOffset, hitbox.Width, hitbox.Height);
 					}
-					else rew.DrawString(font, item[n].text, hitbox.X + xOffset, box.Y + yOffset, hitbox.Width, hitbox.Height, Color.White, 12f);
+					else rew.DrawString(font, item[n].text, hitbox.X + xOffset, box.Y + yOffset, hitbox.Width, hitbox.Height);
 				}
 			}
 		}
@@ -128,14 +128,14 @@ namespace ChatFaceZ.tUserInterface
 		{
 			if (bar.parent.Contains((int)mouseScreen.X, (int)mouseScreen.Y))
 			{
-				if (Keyboard.GetState().IsKeyDown(Keys.Down))
+				if (Foundation.KeyDown(Key.Down))
 				{
 					if (bar.value * (bar.parent.Height - Height) < bar.parent.Height - Height)
 					{
 						bar.value += 0.04f;
 					}
 				}
-				if (Keyboard.GetState().IsKeyDown(Keys.Up))
+				if (Foundation.KeyDown(Key.Up))
 				{
 					if (bar.value > 0f)
 					{
@@ -160,7 +160,7 @@ namespace ChatFaceZ.tUserInterface
 		}
 		public static void ScrollInteract(Scroll bar, Vector2 mouseScreen)
 		{
-			if (bar.parent.Contains((int)mouseScreen.X, (int)mouseScreen.Y))
+		/*	if (bar.parent.Contains((int)mouseScreen.X, (int)mouseScreen.Y))
 			{
 				if (Mouse.GetState().ScrollWheelValue < oldValue)
 				{
@@ -171,7 +171,7 @@ namespace ChatFaceZ.tUserInterface
 					bar.value = Math.Max(0f, bar.value - 0.1f);
 				}
 				oldValue = Mouse.GetState().ScrollWheelValue;
-			}
+			}*/
 		}
 		public void Draw(RewBatch rew, REW texture, Color color)
 		{
@@ -185,8 +185,8 @@ namespace ChatFaceZ.tUserInterface
 		public Color color => active ? Color.FromArgb((byte)(255 * 0.67f), color2) : Color.FromArgb((byte)(255 * 0.33f), color2);
 		private Color color2 = Color.DodgerBlue;
 		public Rectangle box;
-		private KeyboardState oldState;
-		private KeyboardState keyState => Keyboard.GetState();
+		private Microsoft.Xna.Framework.Input.KeyboardState oldState;
+		private Microsoft.Xna.Framework.Input.KeyboardState keyState => Microsoft.Xna.Framework.Input.Keyboard.GetState();
 		public static Texture2D magicPixel;
 		public static void Initialize(Texture2D magicPixel)
 		{
@@ -207,7 +207,7 @@ namespace ChatFaceZ.tUserInterface
 		}
 		public void UpdateInput()
 		{
-			if (active)
+		/*	if (active)
 			{
 				foreach (Keys key in keyState.GetPressedKeys())
 				{
@@ -236,14 +236,14 @@ namespace ChatFaceZ.tUserInterface
 					}
 				}
 				oldState = keyState;
-			}
+			}				 */
 		}
 		public void DrawText(RewBatch rew, REW bgTexture, string font, bool drawMagicPixel = false)
 		{
 			if (!active)
 				return;
 			rew.Draw(bgTexture, box.X, box.Y);
-			rew.DrawString(font, text, box.X + 2, box.Y + 1, bgTexture.Width, bgTexture.Height, Color.White, 12f);
+			rew.DrawString(font, text, box.X + 2, box.Y + 1, bgTexture.Width, bgTexture.Height);
 		}
 	}
 	public class Button
@@ -277,11 +277,11 @@ namespace ChatFaceZ.tUserInterface
 		public REW texture;
 		public bool LeftClick()
 		{
-			return active && box.Contains((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y) && Main.MouseLeft;
+			return active && box.Contains((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y);// && Foundation.MouseLeft;
 		}
 		public bool LeftClick(Rectangle hitbox)
 		{
-			return active && hitbox.Contains((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y) && Main.MouseLeft;
+			return active && hitbox.Contains((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y) && Foundation.MouseLeft;
 		}
 		public bool HoverOver()
 		{
@@ -330,10 +330,10 @@ namespace ChatFaceZ.tUserInterface
 			get { return active ? Color.FromArgb((byte)(255 * 0.67f), Color.DodgerBlue) : Color.FromArgb((byte)(255 * 0.33f), Color.DodgerBlue); }
 		}
 		public Rectangle box;
-		private KeyboardState oldState;
-		private KeyboardState keyState
+		private Microsoft.Xna.Framework.Input.KeyboardState oldState;
+		private Microsoft.Xna.Framework.Input.KeyboardState keyState
 		{
-			get { return Keyboard.GetState(); }
+			get { return Microsoft.Xna.Framework.Input.Keyboard.GetState(); }
 		}
 		public InputBox(Rectangle box)
 		{
@@ -351,22 +351,22 @@ namespace ChatFaceZ.tUserInterface
 		{
 			if (active)
 			{
-				foreach (Keys key in keyState.GetPressedKeys())
+				foreach (Microsoft.Xna.Framework.Input.Keys key in keyState.GetPressedKeys())
 				{
 					if (oldState.IsKeyUp(key))
 					{
-						if (key == Keys.F3)
+						if (key == Microsoft.Xna.Framework.Input.Keys.F3)
 							return;
-						if (key == Keys.Back)
+						if (key == Microsoft.Xna.Framework.Input.Keys.Back)
 						{
 							if (text.Length > 0)
 								text = text.Remove(text.Length - 1);
 							oldState = keyState;
 							return;
 						}
-						else if (key == Keys.Space)
+						else if (key == Microsoft.Xna.Framework.Input.Keys.Space)
 							text += " ";
-						else if (key == Keys.OemPeriod)
+						else if (key == Microsoft.Xna.Framework.Input.Keys.OemPeriod)
 							text += ".";
 						else if (text.Length < 24 && (key.ToString().StartsWith('D') || key.ToString().Length == 1))
 						{

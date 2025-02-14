@@ -60,7 +60,8 @@ namespace TestConsole
 		}
 
 		private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
-		{
+		{	
+			return;
 			Console.WriteLine("Hey guys! I am an application connected via TwitchLib!");
 			client.SendMessage(e.Channel, "Hey guys! I am an application connected via TwitchLib!");
 		}
